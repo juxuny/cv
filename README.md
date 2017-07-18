@@ -25,6 +25,17 @@ func TestBlur(t *testing.T) {
 }
 ```
 
+##### Result
+
+before:
+
+![](res/1.jpg)
+
+after:
+
+![](res/blur.jpg)
+
+
 ### RGB - Grayscal
 
 simple implement:
