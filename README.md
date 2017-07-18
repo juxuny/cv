@@ -6,7 +6,7 @@
 There is an example in `blur_test.go`
 
 such like this: 
-```
+```golang
 func TestBlur(t *testing.T) {
 	f, e := os.Open("./res/1.jpg")
 	if e != nil {
@@ -25,7 +25,7 @@ func TestBlur(t *testing.T) {
 }
 ```
 
-##### Result
+**Result**
 
 before:
 
@@ -36,7 +36,7 @@ after:
 ![](res/blur.jpg)
 
 
-### RGB - Grayscal
+### RGB -> Grayscale
 
 simple implement:
 
