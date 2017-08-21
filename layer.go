@@ -1,5 +1,9 @@
 package cv
 
+import (
+	"fmt"
+)
+
 type IOLayer struct {
 	W, H  int
 	Units []Matrix
@@ -15,12 +19,21 @@ func NewIOLayer(deep, w, h int) (l IOLayer) {
 	return
 }
 
+func (this IOLayer) String() (s string) {
+	s = "\n"
+	for d := 0; d < this.Deep(); d++ {
+		s += fmt.Sprintf("deep: %v\n", d)
+		s += this.Units[d].String()
+	}
+	return
+}
+
 func (this IOLayer) Walk(w, h, stepWidth, padding int, f func(deep, inLeft, inTop int, crop Matrix)) {
 	this.EachUnit(func(deep int, unit Matrix) {
 		p := unit.PaddingWith(padding, 0)
-		for i := 0; i+w < p.W; i += stepWidth {
-			for j := 0; j+h < p.H; j += stepWidth {
-				crop := p.Crop(i, j, i+w, j+h)
+		for i := 0; i+w-1 < p.W; i += stepWidth {
+			for j := 0; j+h-1 < p.H; j += stepWidth {
+				crop := p.Crop(i, j, i+w-1, j+h-1)
 				f(deep, i, j, crop)
 			}
 		}

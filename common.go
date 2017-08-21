@@ -1,5 +1,13 @@
 package cv
 
+import (
+	"fmt"
+)
+
+func log(x ...interface{}) {
+	fmt.Println(x...)
+}
+
 type IntSet map[int]bool
 
 func NewIntSet() (s IntSet) {

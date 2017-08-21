@@ -1,5 +1,9 @@
 package cv
 
+import (
+	"fmt"
+)
+
 type DataType float64
 
 type Matrix struct {
@@ -27,7 +31,7 @@ func (this *Matrix) Get(c, r int) (f DataType) {
 }
 
 func (this *Matrix) Set(c, r int, v DataType) {
-	this.Data[r*this.W+c] = v
+	this.Data[r*this.Width()+c] = v
 }
 
 func (this *Matrix) DotProduct(f Matrix) (r DataType) {
@@ -76,5 +80,16 @@ func (this Matrix) PaddingWith(width int, v DataType) (out Matrix) {
 			out.Set(x, y, v)
 		}
 	})
+	return
+}
+
+func (this Matrix) String() (s string) {
+	s += fmt.Sprintf("%v x %v\n", this.Width(), this.Height())
+	for j := 0; j < this.Height(); j++ {
+		for i := 0; i < this.Width(); i++ {
+			s += fmt.Sprintf("%v", this.Get(i, j)) + " "
+		}
+		s += "\n"
+	}
 	return
 }
