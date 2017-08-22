@@ -2,6 +2,7 @@ package cv
 
 import (
 	"fmt"
+	"math"
 )
 
 func log(x ...interface{}) {
@@ -64,5 +65,14 @@ func Min(x ...DataType) (v DataType) {
 			v = x[i]
 		}
 	}
+	return
+}
+
+func LogisticFunc(x float64) float64 {
+	return 1 / (1 + math.Exp(-x))
+}
+
+func ConvertArrayToMatrix(w, h int, a []DataType) (m Matrix) {
+	m = Matrix{W: w, H: h, Data: a}
 	return
 }

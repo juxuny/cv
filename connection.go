@@ -27,6 +27,10 @@ func (this Connection) Add(from int, to ...int) {
 	}
 }
 
+func (this Connection) Has(from, to int) bool {
+	return this[from].Has(to)
+}
+
 func (this Connection) Each(f func(from int, to IntSet)) {
 	for i := 0; i < len(this); i++ {
 		f(i, this[i])

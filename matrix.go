@@ -18,6 +18,14 @@ func NewMatrix(w, h int) (m Matrix) {
 	return
 }
 
+func CreateMatrix(w, h int, x ...DataType) (m Matrix) {
+	if len(x) < w*h {
+		panic("not enough data")
+	}
+	m = ConvertArrayToMatrix(w, h, x)
+	return
+}
+
 func (this *Matrix) Width() (w int) {
 	return this.W
 }
@@ -32,6 +40,16 @@ func (this *Matrix) Get(c, r int) (f DataType) {
 
 func (this *Matrix) Set(c, r int, v DataType) {
 	this.Data[r*this.Width()+c] = v
+}
+
+func (this *Matrix) Add(c, r int, v DataType) {
+	this.Data[r*this.Width()+c] += v
+}
+
+func (this *Matrix) AddAll(v DataType) {
+	for i := 0; i < len(this.Data); i++ {
+		this.Data[i] += v
+	}
 }
 
 func (this *Matrix) DotProduct(f Matrix) (r DataType) {
@@ -72,7 +90,10 @@ func (this Matrix) Max() DataType {
 }
 
 func (this Matrix) PaddingWith(width int, v DataType) (out Matrix) {
-	out = NewMatrix(this.W+width, this.H+width)
+	if width <= 0 {
+		return this
+	}
+	out = NewMatrix(this.W+width*2, this.H+width*2)
 	out.Each(func(x, y int, v DataType) {
 		if x >= width && x < out.W-width && y >= width && y < out.H-width {
 			out.Set(x, y, this.Get(x-width, y-width))
@@ -92,4 +113,10 @@ func (this Matrix) String() (s string) {
 		s += "\n"
 	}
 	return
+}
+
+func (this *Matrix) Apply(f func(x, y int, v DataType) DataType) {
+	this.Each(func(x, y int, v DataType) {
+		this.Set(x, y, f(x, y, v))
+	})
 }

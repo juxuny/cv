@@ -29,10 +29,13 @@ func (this IOLayer) String() (s string) {
 }
 
 func (this IOLayer) Walk(w, h, stepWidth, padding int, f func(deep, inLeft, inTop int, crop Matrix)) {
+	if stepWidth < 1 {
+		panic("step width can't smaller than one")
+	}
 	this.EachUnit(func(deep int, unit Matrix) {
 		p := unit.PaddingWith(padding, 0)
-		for i := 0; i+w-1 < p.W; i += stepWidth {
-			for j := 0; j+h-1 < p.H; j += stepWidth {
+		for j := 0; j+h-1 < p.H; j += stepWidth {
+			for i := 0; i+w-1 < p.W; i += stepWidth {
 				crop := p.Crop(i, j, i+w-1, j+h-1)
 				f(deep, i, j, crop)
 			}
@@ -66,20 +69,17 @@ func (this IOLayer) Set(deep int, x, y int, v DataType) {
 	this.Units[deep].Set(x, y, v)
 }
 
+func (this IOLayer) Add(deep, x, y int, v DataType) {
+	this.Units[deep].Add(x, y, v)
+}
+
 func (this IOLayer) EachUnit(handler func(deep int, unit Matrix)) {
 	for i := 0; i < len(this.Units); i++ {
 		handler(i, this.Units[i])
 	}
 }
 
-type WeightLayer struct {
-	W, H  int
-	Units []Matrix
-	Bias  DataType
-}
-
-type ReLU struct {
-}
+type ReLU struct{}
 
 func (this ReLU) Compute(in IOLayer) (out IOLayer) {
 	out = in.Clone()
