@@ -81,6 +81,18 @@ func (this IOLayer) EachUnit(handler func(deep int, unit Matrix)) {
 
 type ReLU struct{}
 
+func (this ReLU) ComputeMatrix(in Matrix) (out Matrix) {
+	out = NewMatrix(in.Width(), in.Height())
+	in.Each(func(x, y int, v DataType) {
+		if v > 0 {
+			out.Set(x, y, v)
+		} else {
+			out.Set(x, y, 0)
+		}
+	})
+	return
+}
+
 func (this ReLU) Compute(in IOLayer) (out IOLayer) {
 	out = in.Clone()
 	in.EachUnit(func(deep int, unit Matrix) {
@@ -133,5 +145,61 @@ func (this MinPool) Compute(in IOLayer) (out IOLayer) {
 	in.Walk(this.W, this.W, this.W, 0, func(deep, inLeft, inTop int, crop Matrix) {
 		out.Set(deep, inLeft>>1, inTop>>1, crop.Max())
 	})
+	return
+}
+
+type TransformLayer struct {
+	fun func(DataType) DataType
+}
+
+func (this TransformLayer) ComputeMatrix(in Matrix) (out Matrix) {
+	out = NewMatrix(in.Width(), in.Height())
+	in.Each(func(x, y int, v DataType) {
+		out.Set(x, y, this.fun(v))
+	})
+	return
+}
+
+func (this TransformLayer) Compute(in IOLayer) (out IOLayer) {
+	out = NewIOLayer(in.Deep(), in.Width(), in.Height())
+	in.EachUnit(func(deep int, unit Matrix) {
+		out.Units[deep] = this.ComputeMatrix(unit)
+	})
+	return
+}
+
+type ConvLayer struct {
+	filters []Filter
+}
+
+// num: the number of filter
+// deep: deep for each filter
+func NewDefaultConvLayer(num, deep, w, h int) (c ConvLayer) {
+	c.filters = make([]Filter, num)
+	for i := 0; i < deep; i++ {
+		c.filters[i] = NewFilter(deep, w, h)
+		for j := 0; j < deep; j++ {
+			c.filters[i].Units[j] = CreateGaussianMatrix(w, h)
+			c.filters[i].Bias = RandValue()
+		}
+	}
+	return
+}
+
+func (this ConvLayer) Deep() int {
+	return len(this.filters)
+}
+
+func (this ConvLayer) Compute(in IOLayer, padding, stepWidth int) (out IOLayer) {
+	ms := []Matrix{}
+	w := 0
+	h := 0
+	for d := 0; d < len(this.filters); d++ {
+		m := this.filters[d].Compute(in, padding, stepWidth)
+		ms = append(ms, m)
+		w = m.Width()
+		h = m.Height()
+	}
+	out = IOLayer{W: w, H: h, Units: ms}
 	return
 }

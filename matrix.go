@@ -26,6 +26,13 @@ func CreateMatrix(w, h int, x ...DataType) (m Matrix) {
 	return
 }
 
+func CreateGaussianMatrix(w, h int) (m Matrix) {
+	n := w * h
+	a := RandGaussianDistributionArray(n)
+	m = CreateMatrix(w, h, a...)
+	return
+}
+
 func (this *Matrix) Width() (w int) {
 	return this.W
 }

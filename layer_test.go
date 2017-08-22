@@ -98,4 +98,13 @@ func TestFilter(t *testing.T) {
 	w.Bias = 0
 	out = w.Compute(in, 1, 2)
 	t.Log(out)
+	actLayer := TransformLayer{fun: LogisticFunc}
+	out = actLayer.ComputeMatrix(out)
+	t.Log(out)
+	out = ReLU{}.ComputeMatrix(out)
+	t.Log(out)
+}
+
+func TestTrain(t *testing.T) {
+	Train("res/2/1.png")
 }

@@ -2,8 +2,18 @@ package cv
 
 import (
 	"fmt"
+	"image"
+	_ "image/jpeg"
+	_ "image/png"
 	"math"
+	"math/rand"
+	"os"
+	"time"
 )
+
+func init() {
+	rand.Seed(time.Now().Unix())
+}
 
 func log(x ...interface{}) {
 	fmt.Println(x...)
@@ -68,11 +78,76 @@ func Min(x ...DataType) (v DataType) {
 	return
 }
 
-func LogisticFunc(x float64) float64 {
-	return 1 / (1 + math.Exp(-x))
+func LogisticFunc(x DataType) DataType {
+	return DataType(1 / (1 + math.Exp(float64(-x))))
 }
 
 func ConvertArrayToMatrix(w, h int, a []DataType) (m Matrix) {
 	m = Matrix{W: w, H: h, Data: a}
+	return
+}
+
+//the function approximates the CDF(Cumulative distribution function[edit])
+//refer: https://en.wikipedia.org/wiki/Normal_distribution
+func StandardNormalCDF(x float64) (r float64) {
+	sum := x
+	value := x
+	for i := 1; i <= 1000; i++ {
+		value = (value * x * x / (2*float64(i) + 1))
+		sum += value
+	}
+	r = 0.5 + (sum/math.Sqrt(2*math.Pi))*math.Exp(-(x*x)/2)
+	return
+}
+
+//refer: https://en.wikipedia.org/wiki/Gaussian_function
+func StandardNormalPDF(mu, sigma, x float64) (r float64) {
+	r = GaussianFunction(mu, sigma, x)
+	return
+}
+
+func RandValue() (r DataType) {
+	return DataType(GaussianFunction(0, 1, rand.Float64()))
+}
+
+func RandArray(n int) (r []DataType) {
+	r = make([]DataType, n)
+	for i := 0; i < n; i++ {
+		r[i] = DataType(rand.Float64())
+	}
+	return
+}
+
+func RandGaussianDistributionArray(n int) (r []DataType) {
+	r = make([]DataType, n)
+	for i := 0; i < n; i++ {
+		r[i] = DataType(GaussianFunction(0, 1, rand.Float64()))
+	}
+	return
+}
+
+func LoadImage(fileName string) (in IOLayer, e error) {
+	f, e := os.Open(fileName)
+	if e != nil {
+		return
+	}
+	defer f.Close()
+	img, _, e := image.Decode(f)
+	if e != nil {
+		return
+	}
+	b := img.Bounds()
+	w := b.Max.X
+	h := b.Max.Y
+	in = NewIOLayer(3, w, h)
+	for i := 0; i < w; i++ {
+		for j := 0; j < h; j++ {
+			c := img.At(i, j)
+			r, g, b, _ := c.RGBA()
+			in.Set(0, i, j, DataType(convert16To8(r)))
+			in.Set(1, i, j, DataType(convert16To8(g)))
+			in.Set(2, i, j, DataType(convert16To8(b)))
+		}
+	}
 	return
 }
