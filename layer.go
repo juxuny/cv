@@ -13,6 +13,7 @@ func NewIOLayer(deep, w, h int) (l IOLayer) {
 	l.W = w
 	l.H = h
 	l.Units = make([]Matrix, deep)
+
 	for i := 0; i < deep; i++ {
 		l.Units[i] = NewMatrix(w, h)
 	}
@@ -128,6 +129,10 @@ type AveragePool struct {
 	W int
 }
 
+func NewDefaultAveragePool() (p AveragePool) {
+	return AveragePool{W: 2}
+}
+
 func (this AveragePool) Compute(in IOLayer) (out IOLayer) {
 	out = NewIOLayer(in.Deep(), in.Width()>>1, in.Height()>>1)
 	in.Walk(this.W, this.W, this.W, 0, func(deep, inLeft, inTop int, crop Matrix) {
@@ -176,7 +181,7 @@ type ConvLayer struct {
 // deep: deep for each filter
 func NewDefaultConvLayer(num, deep, w, h int) (c ConvLayer) {
 	c.filters = make([]Filter, num)
-	for i := 0; i < deep; i++ {
+	for i := 0; i < num; i++ {
 		c.filters[i] = NewFilter(deep, w, h)
 		for j := 0; j < deep; j++ {
 			c.filters[i].Units[j] = CreateGaussianMatrix(w, h)

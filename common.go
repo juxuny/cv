@@ -151,3 +151,20 @@ func LoadImage(fileName string) (in IOLayer, e error) {
 	}
 	return
 }
+
+func Standardization(in IOLayer) (ret IOLayer) {
+	ret = in.Clone()
+	in.EachUnit(func(deep int, unit Matrix) {
+		unit.Each(func(x, y int, v DataType) {
+			ret.Set(deep, x, y, v/255.0)
+		})
+	})
+	return
+}
+
+func CreateResultArray(trueDigital int) (r Array) {
+	d := make([]DataType, 10)
+	d[trueDigital] = 1
+	r = NewArray(d...)
+	return
+}

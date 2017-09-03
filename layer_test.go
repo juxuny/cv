@@ -106,5 +106,5 @@ func TestFilter(t *testing.T) {
 }
 
 func TestTrain(t *testing.T) {
-	Train("res/2/1.png")
+	Train("res/2/1.png", CreateResultArray(2))
 }

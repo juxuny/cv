@@ -104,6 +104,10 @@ func (this Matrix) Max() DataType {
 	return Max(this.Data...)
 }
 
+func (this Matrix) Min() DataType {
+	return Min(this.Data...)
+}
+
 func (this Matrix) PaddingWith(width int, v DataType) (out Matrix) {
 	if width <= 0 {
 		return this
