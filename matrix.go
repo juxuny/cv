@@ -8,7 +8,7 @@ type DataType float64
 
 type Matrix struct {
 	W, H int
-	Data []DataType
+	Data Array
 }
 
 func NewMatrix(w, h int) (m Matrix) {
@@ -59,11 +59,19 @@ func (this *Matrix) AddAll(v DataType) {
 	}
 }
 
+func (this Matrix) Rotate180() (m Matrix) {
+	m = NewMatrix(this.Width(), this.Height())
+	m.Data = this.Data.Revert()
+	return
+}
+
 func (this *Matrix) DotProduct(f Matrix) (r DataType) {
-	r = 0
-	for i, v := range this.Data {
-		r += v * f.Data[i]
-	}
+	r = Convolve(this.Data, f.Data)
+	//	r = 0
+	//	n := len(f.Data)
+	//	for i, v := range this.Data {
+	//		r += v * f.Data[n-i-1]
+	//	}
 	return
 }
 
