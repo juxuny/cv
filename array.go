@@ -2,6 +2,13 @@ package cv
 
 type Array []DataType
 
+func (this Array) Append(a Array) Array {
+	for i := 0; i < len(a); i++ {
+		this = append(this, a[i])
+	}
+	return this
+}
+
 func NewArray(d ...DataType) (ret Array) {
 	for i := 0; i < len(d); i++ {
 		ret = append(ret, d[i])
@@ -34,5 +41,12 @@ func Convolve(a, b Array) (ret DataType) {
 	for i := 0; i < len(a); i++ {
 		ret += a[i] * b[n-i-1]
 	}
+	return
+}
+
+func IOLayerToArray(a IOLayer) (ret Array) {
+	a.EachUnit(func(d int, unit Matrix) {
+		ret = ret.Append(unit.Data)
+	})
 	return
 }

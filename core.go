@@ -1,22 +1,30 @@
 package cv
 
+import (
+	"math"
+)
+
 var (
-	input  IOLayer
-	c1     ConvLayer
-	tran   TransformLayer = TransformLayer{fun: LogisticFunc}
-	o1     IOLayer
-	p1     AveragePool
-	c2     ConvLayer
-	o2     IOLayer
-	p2     AveragePool
-	fc1    ConvLayer
-	fco1   IOLayer
-	fc2    ConvLayer
-	fco2   IOLayer
-	fc3    ConvLayer
-	fco3   IOLayer
-	output IOLayer
-	e      error
+	input IOLayer
+	//6@5x5x3
+	c1   ConvLayer
+	tran TransformLayer = TransformLayer{fun: LogisticFunc}
+	o1   IOLayer
+	p1   AveragePool
+	//16@5x5x6
+	c2 ConvLayer
+	o2 IOLayer
+	p2 AveragePool
+	//120@1x1x16
+	fc1  ConvLayer
+	fco1 IOLayer
+	//84@1x1x192
+	fc2  ConvLayer
+	fco2 IOLayer
+	//10@1x1x84
+	fc3  ConvLayer
+	fco3 IOLayer
+	e    error
 )
 
 func init() {
@@ -30,6 +38,17 @@ func init() {
 	fc3 = NewDefaultConvLayer(10, 84, 1, 1)
 }
 
+func Loss(out, realResult Array) (loss DataType) {
+	if len(out) != len(realResult) {
+		panic("can't handle two array without same length")
+	}
+	for i := 0; i < len(out); i++ {
+		loss += DataType(math.Pow(float64(out[i]-realResult[i]), 2))
+	}
+	loss /= 2
+	return
+}
+
 func Train(fileName string, realResult Array) {
 	input, e = LoadImage(fileName)
 	if e != nil {
@@ -38,6 +57,8 @@ func Train(fileName string, realResult Array) {
 	}
 	input = Standardization(input)
 	Test()
+	log("Loss: ", Loss(IOLayerToArray(fco3), realResult))
+	UpdateWeight(realResult)
 }
 
 func Test() {
@@ -59,4 +80,8 @@ func Test() {
 	fco3 = tran.Compute(fco3)
 
 	log(fco3)
+}
+
+func UpdateWeight(realResult Array) {
+	//update fc3
 }
