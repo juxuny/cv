@@ -139,3 +139,13 @@ func (this *Matrix) Apply(f func(x, y int, v DataType) DataType) {
 		this.Set(x, y, f(x, y, v))
 	})
 }
+
+func Upsampling(m Matrix) (r Matrix) {
+	r = NewMatrix(m.Width()<<1, m.Height()<<1)
+	for x := 0; x < r.Width(); x++ {
+		for y := 0; y < r.Height(); y++ {
+			r.Set(x, y, m.Get(x>>1, y>>1))
+		}
+	}
+	return
+}

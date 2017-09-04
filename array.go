@@ -50,3 +50,13 @@ func IOLayerToArray(a IOLayer) (ret Array) {
 	})
 	return
 }
+
+func NewZeroArray(length int) (ret Array) {
+	if length < 0 {
+		panic("length is small than 0")
+	}
+	for i := 0; i < length; i++ {
+		ret = append(ret, 0)
+	}
+	return
+}

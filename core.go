@@ -15,15 +15,9 @@ var (
 	c2 ConvLayer
 	o2 IOLayer
 	p2 AveragePool
-	//120@1x1x16
-	fc1  ConvLayer
-	fco1 IOLayer
-	//84@1x1x192
+	//10@5x5x16
 	fc2  ConvLayer
 	fco2 IOLayer
-	//10@1x1x84
-	fc3  ConvLayer
-	fco3 IOLayer
 	e    error
 )
 
@@ -32,10 +26,7 @@ func init() {
 	p1 = NewDefaultAveragePool()
 	c2 = NewDefaultConvLayer(16, 6, 5, 5)
 	p2 = NewDefaultAveragePool()
-
-	fc1 = NewDefaultConvLayer(160, 16, 5, 5)
-	fc2 = NewDefaultConvLayer(84, 160, 1, 1)
-	fc3 = NewDefaultConvLayer(10, 84, 1, 1)
+	fc2 = NewDefaultConvLayer(10, 16, 5, 5)
 }
 
 func Loss(out, realResult Array) (loss DataType) {
@@ -57,8 +48,10 @@ func Train(fileName string, realResult Array) {
 	}
 	input = Standardization(input)
 	Test()
-	log("Loss: ", Loss(IOLayerToArray(fco3), realResult))
+	log("Loss: ", Loss(IOLayerToArray(fco2), realResult))
 	UpdateWeight(realResult)
+	Test()
+	log("Loss: ", Loss(IOLayerToArray(fco2), realResult))
 }
 
 func Test() {
@@ -70,18 +63,15 @@ func Test() {
 	o2 = tran.Compute(o2)
 	o2 = p2.Compute(o2)
 
-	fco1 = fc1.Compute(o2, 0, 1)
-	fco1 = tran.Compute(fco1)
+	//	fco1 = fc1.Compute(o2, 0, 1)
+	//	fco1 = tran.Compute(fco1)
 
-	fco2 = fc2.Compute(fco1, 0, 1)
+	fco2 = fc2.Compute(o2, 0, 1)
 	fco2 = tran.Compute(fco2)
 
-	fco3 = fc3.Compute(fco2, 0, 1)
-	fco3 = tran.Compute(fco3)
-
-	log(fco3)
+	//	log(fco3)
 }
 
 func UpdateWeight(realResult Array) {
-	//update fc3
+	//TODO
 }

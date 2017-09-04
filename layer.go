@@ -191,7 +191,19 @@ func NewDefaultConvLayer(num, deep, w, h int) (c ConvLayer) {
 	return
 }
 
-func (this ConvLayer) Deep() int {
+//create a initial layer
+func NewConvLayer(num, deep, w, h int) (c ConvLayer) {
+	c.filters = make([]Filter, num)
+	for i := 0; i < num; i++ {
+		c.filters[i] = NewFilter(deep, w, h)
+		for j := 0; j < deep; j++ {
+			c.filters[i].Units[j] = CreateMatrix(w, h, NewZeroArray(w*h)...)
+		}
+	}
+	return
+}
+
+func (this ConvLayer) Num() int {
 	return len(this.filters)
 }
 
